@@ -2,20 +2,23 @@
 
 import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { Recipe } from "@/data/recipes";
+import { getPantryMatch } from "@/lib/pantryMatch";
 
 const SWIPE_THRESHOLD = 100;
 
 interface SwipeCardProps {
   recipe: Recipe;
+  pantry: Record<string, boolean>;
   onSwiped: (liked: boolean) => void;
   onOpenDetail: () => void;
 }
 
-export default function SwipeCard({ recipe, onSwiped, onOpenDetail }: SwipeCardProps) {
+export default function SwipeCard({ recipe, pantry, onSwiped, onOpenDetail }: SwipeCardProps) {
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-200, 200], [-15, 15]);
   const likeOpacity = useTransform(x, [20, 120], [0, 1]);
   const nopeOpacity = useTransform(x, [-120, -20], [1, 0]);
+  const pantryMatch = getPantryMatch(recipe, pantry);
 
   function handleDragEnd(_: unknown, info: PanInfo) {
     if (info.offset.x > SWIPE_THRESHOLD) {
@@ -67,6 +70,15 @@ export default function SwipeCard({ recipe, onSwiped, onOpenDetail }: SwipeCardP
             <span>💰 約{recipe.costYen}円</span>
             <span>{"★".repeat(recipe.difficulty)}{"☆".repeat(3 - recipe.difficulty)}</span>
           </div>
+          {pantryMatch.missing.length === 0 ? (
+            <span className="self-start rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+              ✅ 今の在庫で作れる
+            </span>
+          ) : pantryMatch.missing.length <= 2 ? (
+            <span className="self-start rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+              🛒 あと{pantryMatch.missing.map((i) => i.name).join("・")}で作れる
+            </span>
+          ) : null}
           <div className="flex flex-wrap gap-1.5">
             {recipe.tags.slice(0, 4).map((tag) => (
               <span

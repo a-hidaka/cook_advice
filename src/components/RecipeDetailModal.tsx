@@ -1,13 +1,17 @@
 "use client";
 
 import { Recipe } from "@/data/recipes";
+import { getPantryMatch } from "@/lib/pantryMatch";
 
 interface RecipeDetailModalProps {
   recipe: Recipe;
+  pantry: Record<string, boolean>;
   onClose: () => void;
 }
 
-export default function RecipeDetailModal({ recipe, onClose }: RecipeDetailModalProps) {
+export default function RecipeDetailModal({ recipe, pantry, onClose }: RecipeDetailModalProps) {
+  const pantryMatch = getPantryMatch(recipe, pantry);
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center"
@@ -34,6 +38,12 @@ export default function RecipeDetailModal({ recipe, onClose }: RecipeDetailModal
             閉じる
           </button>
         </div>
+
+        {pantryMatch.missing.length > 0 && (
+          <p className="mb-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-800 dark:bg-amber-900/20 dark:text-amber-200">
+            🛒 足りないかも: {pantryMatch.missing.map((i) => i.name).join("・")}
+          </p>
+        )}
 
         <section className="mb-5">
           <h3 className="mb-2 font-semibold">材料</h3>

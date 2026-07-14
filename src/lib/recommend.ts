@@ -1,9 +1,11 @@
 import { Recipe } from "@/data/recipes";
 import { AppState } from "./storage";
+import { getPantryMatch } from "./pantryMatch";
 
 const TAG_SCORE_MIN = -5;
 const TAG_SCORE_MAX = 5;
 const EXPLORATION_RATE = 0.25; // ワンパターン化を防ぐための完全ランダム抽選の確率
+const PANTRY_BOOST_WEIGHT = 0.3; // 在庫マッチによる重みの上乗せ幅(あくまで軽いブースト)
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
@@ -33,11 +35,18 @@ export function scoreRecipe(
   return total / recipe.tags.length;
 }
 
-function weightedPick(candidates: Recipe[], tagScores: Record<string, number>): Recipe {
+function weightedPick(
+  candidates: Recipe[],
+  tagScores: Record<string, number>,
+  pantry: Record<string, boolean>
+): Recipe {
   const weights = candidates.map((r) => {
     const score = scoreRecipe(r, tagScores);
     // スコアが低い/マイナスのレシピにも最低限のチャンスを残す
-    return Math.max(0.08, 1 + score * 0.5);
+    const base = Math.max(0.08, 1 + score * 0.5);
+    // 在庫でそのまま作れるレシピを軽く優先する(絶対条件にはしない)
+    const pantryRatio = getPantryMatch(r, pantry).ratio;
+    return base * (1 + pantryRatio * PANTRY_BOOST_WEIGHT);
   });
   const total = weights.reduce((a, b) => a + b, 0);
   let threshold = Math.random() * total;
@@ -69,7 +78,7 @@ export function pickNextRecipe(
   const useExploration = Math.random() < EXPLORATION_RATE;
   const recipe = useExploration
     ? unseen[Math.floor(Math.random() * unseen.length)]
-    : weightedPick(unseen, state.tagScores);
+    : weightedPick(unseen, state.tagScores, state.pantry);
 
   return { recipe, seenIds: [...seenIds, recipe.id] };
 }

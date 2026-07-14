@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { recipes, Recipe } from "@/data/recipes";
 import { AppState, loadState, saveState } from "@/lib/storage";
+import { getPantryMatch } from "@/lib/pantryMatch";
+import { PantryItem } from "@/data/pantryItems";
 import RecipeDetailModal from "@/components/RecipeDetailModal";
 import BottomNav from "@/components/BottomNav";
 
@@ -30,6 +32,23 @@ export default function LikedPage() {
     setState(next);
   }
 
+  const shoppingList = (() => {
+    if (!state) return [] as { item: PantryItem; recipeNames: string[] }[];
+    const byItem = new Map<string, { item: PantryItem; recipeNames: string[] }>();
+    for (const recipe of likedRecipes) {
+      const { missing } = getPantryMatch(recipe, state.pantry);
+      for (const item of missing) {
+        const entry = byItem.get(item.id);
+        if (entry) {
+          entry.recipeNames.push(recipe.name);
+        } else {
+          byItem.set(item.id, { item, recipeNames: [recipe.name] });
+        }
+      }
+    }
+    return Array.from(byItem.values());
+  })();
+
   return (
     <div className="mx-auto flex h-dvh w-full max-w-md flex-col">
       <header className="px-5 pb-2 pt-5">
@@ -40,6 +59,24 @@ export default function LikedPage() {
       </header>
 
       <main className="flex-1 overflow-y-auto px-5 pb-4">
+        {shoppingList.length > 0 && (
+          <section className="mb-4 rounded-2xl bg-amber-50 p-4 dark:bg-amber-900/20">
+            <h2 className="mb-2 text-sm font-semibold text-amber-800 dark:text-amber-200">
+              🛒 買い物リスト(お気に入りに足りない食材)
+            </h2>
+            <ul className="flex flex-wrap gap-1.5">
+              {shoppingList.map(({ item, recipeNames }) => (
+                <li
+                  key={item.id}
+                  title={`使うレシピ: ${recipeNames.join("・")}`}
+                  className="rounded-full bg-white px-2.5 py-1 text-xs text-amber-800 shadow-sm dark:bg-neutral-900 dark:text-amber-200"
+                >
+                  {item.name}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
         {likedRecipes.length === 0 ? (
           <div className="mt-16 flex flex-col items-center gap-2 text-center text-neutral-400">
             <span className="text-4xl">🍽️</span>
@@ -51,7 +88,9 @@ export default function LikedPage() {
           </div>
         ) : (
           <ul className="flex flex-col gap-3">
-            {likedRecipes.map((recipe) => (
+            {likedRecipes.map((recipe) => {
+              const missing = state ? getPantryMatch(recipe, state.pantry).missing.length : 0;
+              return (
               <li
                 key={recipe.id}
                 className="flex items-center gap-3 rounded-2xl bg-white p-3 shadow ring-1 ring-black/5 dark:bg-neutral-900"
@@ -65,6 +104,7 @@ export default function LikedPage() {
                     <span className="font-semibold">{recipe.name}</span>
                     <span className="text-xs text-neutral-500">
                       {recipe.genre} ・ ⏱{recipe.timeMinutes}分 ・ 💰約{recipe.costYen}円
+                      {missing === 0 && " ・ ✅ 作れる"}
                     </span>
                   </span>
                 </button>
@@ -76,13 +116,18 @@ export default function LikedPage() {
                   ✕
                 </button>
               </li>
-            ))}
+              );
+            })}
           </ul>
         )}
       </main>
 
       {detailRecipe && (
-        <RecipeDetailModal recipe={detailRecipe} onClose={() => setDetailRecipe(null)} />
+        <RecipeDetailModal
+          recipe={detailRecipe}
+          pantry={state?.pantry ?? {}}
+          onClose={() => setDetailRecipe(null)}
+        />
       )}
 
       <BottomNav />

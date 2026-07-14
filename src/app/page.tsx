@@ -49,8 +49,9 @@ export default function HomePage() {
   }
 
   function handleReset() {
-    if (!window.confirm("好みの学習データと履歴をすべてリセットしますか？")) return;
-    const fresh = resetState();
+    if (!state) return;
+    if (!window.confirm("好みの学習データと履歴をすべてリセットしますか？(在庫データは残ります)")) return;
+    const fresh = resetState(state.pantry);
     const { recipe, seenIds } = pickNextRecipe(recipes, fresh);
     const next = { ...fresh, seenIds };
     saveState(next);
@@ -86,6 +87,7 @@ export default function HomePage() {
               <SwipeCard
                 key={currentRecipe.id}
                 recipe={currentRecipe}
+                pantry={state?.pantry ?? {}}
                 onSwiped={handleSwipe}
                 onOpenDetail={() => setDetailRecipe(currentRecipe)}
               />
@@ -120,7 +122,11 @@ export default function HomePage() {
       )}
 
       {detailRecipe && (
-        <RecipeDetailModal recipe={detailRecipe} onClose={() => setDetailRecipe(null)} />
+        <RecipeDetailModal
+          recipe={detailRecipe}
+          pantry={state?.pantry ?? {}}
+          onClose={() => setDetailRecipe(null)}
+        />
       )}
 
       <BottomNav />

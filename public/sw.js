@@ -1,5 +1,5 @@
-const CACHE_NAME = "cook-advice-v1";
-const APP_SHELL = ["/", "/liked", "/manifest.json", "/icon-192.png", "/icon-512.png"];
+const CACHE_NAME = "cook-advice-v2";
+const APP_SHELL = ["/", "/liked", "/pantry", "/manifest.json", "/icon-192.png", "/icon-512.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

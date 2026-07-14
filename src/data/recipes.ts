@@ -10,6 +10,7 @@ export interface Recipe {
   difficulty: 1 | 2 | 3; // 1=簡単
   servings: number;
   tags: string[]; // レコメンド学習に使うタグ
+  pantryIds: string[]; // 在庫マッチングに使う食材ID(src/data/pantryItems.ts参照)
   ingredients: { name: string; amount: string }[];
   steps: string[];
   memo?: string;
@@ -32,6 +33,7 @@ export const recipes: Recipe[] = [
     difficulty: 1,
     servings: 1,
     tags: ["韓国", "炒め物", "豚肉", "ワンパン", "節約"],
+    pantryIds: ["pork", "kimchi", "green-onion", "sesame-oil"],
     ingredients: [
       { name: "豚こま肉", amount: "100g" },
       { name: "キムチ", amount: "80g" },
@@ -54,6 +56,7 @@ export const recipes: Recipe[] = [
     difficulty: 1,
     servings: 1,
     tags: ["和食", "丼", "鶏肉", "米", "節約", "ワンパン"],
+    pantryIds: ["chicken", "soy-sauce", "mirin", "sugar", "rice"],
     ingredients: [
       { name: "鶏むね肉", amount: "150g" },
       { name: "醤油・みりん・砂糖", amount: "各大さじ1" },
@@ -75,6 +78,7 @@ export const recipes: Recipe[] = [
     difficulty: 2,
     servings: 1,
     tags: ["中華", "炒め物", "豆腐", "豚肉", "節約"],
+    pantryIds: ["tofu", "pork", "doubanjiang", "miso", "soy-sauce", "green-onion"],
     ingredients: [
       { name: "木綿豆腐", amount: "1/2丁" },
       { name: "豚ひき肉", amount: "80g" },
@@ -97,6 +101,7 @@ export const recipes: Recipe[] = [
     difficulty: 1,
     servings: 1,
     tags: ["洋食", "麺類", "野菜多め", "ワンパン", "節約"],
+    pantryIds: ["pasta", "bacon-sausage-ham", "bell-pepper", "onion", "ketchup"],
     ingredients: [
       { name: "パスタ", amount: "100g" },
       { name: "ウインナー", amount: "2本" },
@@ -119,6 +124,7 @@ export const recipes: Recipe[] = [
     difficulty: 1,
     servings: 1,
     tags: ["和食", "丼", "豆腐", "卵", "時短", "節約"],
+    pantryIds: ["tofu", "egg", "mentsuyu", "rice"],
     ingredients: [
       { name: "絹豆腐", amount: "1/2丁" },
       { name: "卵", amount: "1個" },
@@ -141,6 +147,7 @@ export const recipes: Recipe[] = [
     difficulty: 1,
     servings: 1,
     tags: ["和食", "炒め物", "野菜多め", "節約", "ワンパン"],
+    pantryIds: ["cabbage", "moyashi", "carrot", "pork", "salt", "pepper", "soy-sauce"],
     ingredients: [
       { name: "キャベツ・もやし・にんじん", amount: "合わせて200g" },
       { name: "豚こま肉", amount: "50g" },
@@ -162,6 +169,7 @@ export const recipes: Recipe[] = [
     difficulty: 1,
     servings: 1,
     tags: ["中華", "麺類", "卵", "時短", "節約", "ワンパン"],
+    pantryIds: ["instant-ramen", "egg", "green-onion"],
     ingredients: [
       { name: "インスタントラーメン", amount: "1袋" },
       { name: "卵", amount: "1個" },
@@ -183,6 +191,7 @@ export const recipes: Recipe[] = [
     difficulty: 1,
     servings: 1,
     tags: ["和食", "麺類", "豚肉", "野菜多め", "ワンパン", "節約"],
+    pantryIds: ["udon", "pork", "cabbage", "moyashi", "soy-sauce"],
     ingredients: [
       { name: "うどん(茹で)", amount: "1玉" },
       { name: "豚こま肉", amount: "80g" },
@@ -205,6 +214,7 @@ export const recipes: Recipe[] = [
     difficulty: 1,
     servings: 1,
     tags: ["中華", "米", "卵", "時短", "節約", "ワンパン"],
+    pantryIds: ["rice", "egg", "green-onion", "soy-sauce", "chicken-stock"],
     ingredients: [
       { name: "ごはん", amount: "1杯" },
       { name: "卵", amount: "1個" },
@@ -227,6 +237,7 @@ export const recipes: Recipe[] = [
     difficulty: 1,
     servings: 1,
     tags: ["洋食", "麺類", "魚介", "時短", "節約"],
+    pantryIds: ["pasta", "tuna-can", "garlic", "cooking-oil", "soy-sauce"],
     ingredients: [
       { name: "パスタ", amount: "100g" },
       { name: "ツナ缶", amount: "1缶" },
@@ -249,6 +260,7 @@ export const recipes: Recipe[] = [
     difficulty: 1,
     servings: 1,
     tags: ["和食", "米", "魚介", "混ぜるだけ", "時短", "節約"],
+    pantryIds: ["rice", "salmon-flake", "nori"],
     ingredients: [
       { name: "ごはん", amount: "1杯" },
       { name: "鮭フレーク", amount: "大さじ2" },
@@ -270,6 +282,7 @@ export const recipes: Recipe[] = [
     difficulty: 1,
     servings: 1,
     tags: ["中華", "炒め物", "豚肉", "野菜多め", "節約", "ワンパン"],
+    pantryIds: ["moyashi", "pork", "oyster-sauce", "soy-sauce"],
     ingredients: [
       { name: "もやし", amount: "1袋" },
       { name: "豚ひき肉", amount: "80g" },
@@ -291,6 +304,7 @@ export const recipes: Recipe[] = [
     difficulty: 2,
     servings: 1,
     tags: ["洋食", "麺類", "卵", "ワンパン"],
+    pantryIds: ["udon", "bacon-sausage-ham", "egg", "cheese", "pepper"],
     ingredients: [
       { name: "うどん(茹で)", amount: "1玉" },
       { name: "ベーコン", amount: "2枚" },
@@ -313,6 +327,7 @@ export const recipes: Recipe[] = [
     difficulty: 2,
     servings: 1,
     tags: ["和食", "鍋", "豚肉", "野菜多め"],
+    pantryIds: ["cabbage", "pork", "mentsuyu"],
     ingredients: [
       { name: "キャベツ", amount: "1/4個" },
       { name: "豚バラ薄切り肉", amount: "100g" },
@@ -334,6 +349,7 @@ export const recipes: Recipe[] = [
     difficulty: 2,
     servings: 2,
     tags: ["和食", "スープ", "豚肉", "野菜多め", "作り置き向き"],
+    pantryIds: ["pork", "daikon", "carrot", "burdock", "miso", "dashi"],
     ingredients: [
       { name: "豚こま肉", amount: "100g" },
       { name: "大根・にんじん・ごぼう", amount: "合わせて200g" },
@@ -356,6 +372,7 @@ export const recipes: Recipe[] = [
     difficulty: 2,
     servings: 1,
     tags: ["和食", "丼", "鶏肉", "卵", "米"],
+    pantryIds: ["chicken", "egg", "onion", "mentsuyu", "rice"],
     ingredients: [
       { name: "鶏もも肉", amount: "100g" },
       { name: "卵", amount: "2個" },
@@ -379,6 +396,7 @@ export const recipes: Recipe[] = [
     difficulty: 1,
     servings: 1,
     tags: ["洋食", "麺類", "魚介", "時短", "節約"],
+    pantryIds: ["pasta", "saba-can", "tomato", "garlic"],
     ingredients: [
       { name: "パスタ", amount: "100g" },
       { name: "サバ缶", amount: "1缶" },
@@ -401,6 +419,7 @@ export const recipes: Recipe[] = [
     difficulty: 2,
     servings: 1,
     tags: ["和食", "焼き物", "豆腐", "牛肉"],
+    pantryIds: ["tofu", "beef-mix", "panko", "egg", "daikon", "ponzu"],
     ingredients: [
       { name: "木綿豆腐", amount: "1/2丁" },
       { name: "合いびき肉", amount: "100g" },
@@ -423,6 +442,7 @@ export const recipes: Recipe[] = [
     difficulty: 1,
     servings: 1,
     tags: ["エスニック", "炒め物", "鶏肉", "米", "ワンパン"],
+    pantryIds: ["chicken", "bell-pepper", "nanpla", "oyster-sauce", "egg", "rice"],
     ingredients: [
       { name: "鶏ひき肉", amount: "100g" },
       { name: "ピーマン・パプリカ", amount: "各1/2個" },
@@ -446,6 +466,7 @@ export const recipes: Recipe[] = [
     difficulty: 1,
     servings: 1,
     tags: ["中華", "麺類", "野菜多め", "時短"],
+    pantryIds: ["udon", "cucumber", "tomato", "bacon-sausage-ham", "mentsuyu", "vinegar", "sesame-oil"],
     ingredients: [
       { name: "うどん(茹で)", amount: "1玉" },
       { name: "きゅうり・トマト・ハム", amount: "適量" },
@@ -467,6 +488,7 @@ export const recipes: Recipe[] = [
     difficulty: 1,
     servings: 1,
     tags: ["和食", "スープ", "卵", "米", "時短", "節約"],
+    pantryIds: ["rice", "egg", "miso", "dashi"],
     ingredients: [
       { name: "ごはん", amount: "1杯" },
       { name: "卵", amount: "1個" },
@@ -489,6 +511,7 @@ export const recipes: Recipe[] = [
     difficulty: 1,
     servings: 1,
     tags: ["和食", "レンジ調理", "鶏肉", "時短"],
+    pantryIds: ["chicken", "green-onion", "sesame-oil", "salt"],
     ingredients: [
       { name: "鶏むね肉", amount: "150g" },
       { name: "酒", amount: "大さじ1" },
@@ -510,6 +533,7 @@ export const recipes: Recipe[] = [
     difficulty: 2,
     servings: 1,
     tags: ["和食", "焼き物", "野菜多め", "卵"],
+    pantryIds: ["cabbage", "flour-starch", "egg", "pork", "sauce", "mayo"],
     ingredients: [
       { name: "キャベツ", amount: "1/6個" },
       { name: "小麦粉・卵", amount: "適量" },
@@ -532,6 +556,7 @@ export const recipes: Recipe[] = [
     difficulty: 1,
     servings: 1,
     tags: ["韓国", "焼き物", "野菜多め", "ワンパン"],
+    pantryIds: ["green-onion", "flour-starch", "egg", "sesame-oil"],
     ingredients: [
       { name: "ニラ", amount: "1束" },
       { name: "小麦粉・片栗粉", amount: "各大さじ3" },
@@ -554,6 +579,7 @@ export const recipes: Recipe[] = [
     difficulty: 2,
     servings: 1,
     tags: ["中華", "丼", "豚肉", "野菜多め", "米"],
+    pantryIds: ["pork", "napa-cabbage", "carrot", "chicken-stock", "flour-starch", "rice"],
     ingredients: [
       { name: "豚こま肉", amount: "80g" },
       { name: "白菜・にんじん・きくらげ", amount: "合わせて150g" },
@@ -576,6 +602,7 @@ export const recipes: Recipe[] = [
     difficulty: 1,
     servings: 1,
     tags: ["中華", "炒め物", "卵", "野菜多め", "時短", "節約"],
+    pantryIds: ["tomato", "egg", "salt", "chicken-stock"],
     ingredients: [
       { name: "トマト", amount: "1個" },
       { name: "卵", amount: "2個" },
@@ -597,6 +624,7 @@ export const recipes: Recipe[] = [
     difficulty: 1,
     servings: 1,
     tags: ["和食", "レンジ調理", "豚肉", "野菜多め", "作り置き向き"],
+    pantryIds: ["potato", "carrot", "onion", "pork", "mentsuyu"],
     ingredients: [
       { name: "じゃがいも・にんじん・玉ねぎ", amount: "合わせて250g" },
       { name: "豚こま肉", amount: "80g" },
@@ -618,6 +646,7 @@ export const recipes: Recipe[] = [
     difficulty: 1,
     servings: 1,
     tags: ["和食", "混ぜるだけ", "鶏肉", "時短", "節約"],
+    pantryIds: ["chicken", "cucumber", "ponzu"],
     ingredients: [
       { name: "鶏皮", amount: "100g" },
       { name: "きゅうり", amount: "1/2本" },
@@ -639,6 +668,7 @@ export const recipes: Recipe[] = [
     difficulty: 1,
     servings: 1,
     tags: ["エスニック", "米", "焼き物", "時短"],
+    pantryIds: ["spam", "rice", "nori", "soy-sauce"],
     ingredients: [
       { name: "スパム", amount: "4切れ" },
       { name: "ごはん", amount: "1杯" },
@@ -660,6 +690,7 @@ export const recipes: Recipe[] = [
     difficulty: 1,
     servings: 1,
     tags: ["和食", "麺類", "豚肉", "時短", "節約"],
+    pantryIds: ["udon", "curry-roux", "pork", "onion", "mentsuyu"],
     ingredients: [
       { name: "うどん(茹で)", amount: "1玉" },
       { name: "カレールー", amount: "1片" },
@@ -682,6 +713,7 @@ export const recipes: Recipe[] = [
     difficulty: 2,
     servings: 1,
     tags: ["中華", "スープ", "豚肉", "野菜多め"],
+    pantryIds: ["pork", "soy-milk", "miso", "doubanjiang", "bok-choy"],
     ingredients: [
       { name: "豚ひき肉", amount: "80g" },
       { name: "豆乳", amount: "200ml" },
@@ -704,6 +736,7 @@ export const recipes: Recipe[] = [
     difficulty: 1,
     servings: 1,
     tags: ["和食", "米", "魚介", "混ぜるだけ", "時短", "節約"],
+    pantryIds: ["rice", "tuna-can", "mayo", "miso", "dashi"],
     ingredients: [
       { name: "ごはん", amount: "1杯" },
       { name: "ツナ缶・マヨネーズ", amount: "適量" },
@@ -725,6 +758,7 @@ export const recipes: Recipe[] = [
     difficulty: 1,
     servings: 1,
     tags: ["和食", "丼", "豆腐", "混ぜるだけ", "時短"],
+    pantryIds: ["avocado", "natto", "soy-sauce", "rice"],
     ingredients: [
       { name: "アボカド", amount: "1/2個" },
       { name: "納豆", amount: "1パック" },
@@ -747,6 +781,7 @@ export const recipes: Recipe[] = [
     difficulty: 1,
     servings: 1,
     tags: ["洋食", "レンジ調理", "野菜多め", "時短"],
+    pantryIds: ["broccoli", "carrot", "bell-pepper", "tuna-can", "garlic", "cooking-oil"],
     ingredients: [
       { name: "ブロッコリー・にんじん・パプリカ", amount: "合わせて200g" },
       { name: "アンチョビ or ツナ", amount: "適量" },
@@ -768,6 +803,7 @@ export const recipes: Recipe[] = [
     difficulty: 1,
     servings: 1,
     tags: ["韓国", "麺類", "鍋", "豚肉", "野菜多め"],
+    pantryIds: ["udon", "kimchi", "pork", "napa-cabbage", "green-onion"],
     ingredients: [
       { name: "うどん(茹で)", amount: "1玉" },
       { name: "キムチ", amount: "100g" },
@@ -790,6 +826,7 @@ export const recipes: Recipe[] = [
     difficulty: 2,
     servings: 1,
     tags: ["洋食", "焼き物", "卵", "米"],
+    pantryIds: ["rice", "chicken", "onion", "ketchup", "egg"],
     ingredients: [
       { name: "ごはん", amount: "1杯" },
       { name: "鶏肉・玉ねぎ", amount: "各適量" },

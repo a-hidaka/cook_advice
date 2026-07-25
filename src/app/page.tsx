@@ -3,22 +3,34 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { recipes, Recipe } from "@/data/recipes";
+import { pantryItems } from "@/data/pantryItems";
 import { AppState, loadState, saveState, resetState } from "@/lib/storage";
 import { applySwipeToScores, pickNextRecipe, topTags } from "@/lib/recommend";
+import { requestAiRecipe } from "@/lib/aiRecipe";
 import SwipeCard from "@/components/SwipeCard";
 import RecipeDetailModal from "@/components/RecipeDetailModal";
 import BottomNav from "@/components/BottomNav";
+
+const AI_DAILY_LIMIT = 10;
+
+function aiCallCountKey(): string {
+  const today = new Date().toISOString().slice(0, 10);
+  return `cook-advice-ai-calls-${today}`;
+}
 
 export default function HomePage() {
   const [state, setState] = useState<AppState | null>(null);
   const [currentRecipe, setCurrentRecipe] = useState<Recipe | null>(null);
   const [detailRecipe, setDetailRecipe] = useState<Recipe | null>(null);
   const [lastResult, setLastResult] = useState<"like" | "no" | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   useEffect(() => {
     // localStorageはSSR時に存在しないため、マウント後にクライアントで読み込む
     const loaded = loadState();
-    const { recipe, seenIds } = pickNextRecipe(recipes, loaded);
+    const allRecipes = [...recipes, ...loaded.customRecipes];
+    const { recipe, seenIds } = pickNextRecipe(allRecipes, loaded);
     const next = { ...loaded, seenIds };
     saveState(next);
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -38,7 +50,8 @@ export default function HomePage() {
     ];
     const interim: AppState = { ...state, tagScores, likedIds, dislikedIds, history };
 
-    const { recipe: nextRecipe, seenIds } = pickNextRecipe(recipes, interim);
+    const allRecipes = [...recipes, ...interim.customRecipes];
+    const { recipe: nextRecipe, seenIds } = pickNextRecipe(allRecipes, interim);
     const finalState: AppState = { ...interim, seenIds };
 
     saveState(finalState);
@@ -50,13 +63,57 @@ export default function HomePage() {
 
   function handleReset() {
     if (!state) return;
-    if (!window.confirm("好みの学習データと履歴をすべてリセットしますか？(在庫データは残ります)")) return;
-    const fresh = resetState(state.pantry);
-    const { recipe, seenIds } = pickNextRecipe(recipes, fresh);
+    if (!window.confirm("好みの学習データと履歴をすべてリセットしますか？(在庫・AI生成レシピは残ります)")) return;
+    const fresh = resetState(state.pantry, state.customRecipes);
+    const allRecipes = [...recipes, ...fresh.customRecipes];
+    const { recipe, seenIds } = pickNextRecipe(allRecipes, fresh);
     const next = { ...fresh, seenIds };
     saveState(next);
     setState(next);
     setCurrentRecipe(recipe);
+  }
+
+  async function handleGenerateAi() {
+    if (!state) return;
+    const countKey = aiCallCountKey();
+    const used = Number(window.localStorage.getItem(countKey) ?? "0");
+    if (used >= AI_DAILY_LIMIT) {
+      setAiError(`今日のAIレシピ生成回数の上限(${AI_DAILY_LIMIT}回)に達しました。また明日お試しください。`);
+      return;
+    }
+
+    setAiLoading(true);
+    setAiError(null);
+    try {
+      const preferredTags = topTags(state.tagScores, 5).map((t) => t.tag);
+      const ownedPantryNames = pantryItems
+        .filter((item) => state.pantry[item.id])
+        .map((item) => item.name);
+      const excludeNames = [...recipes, ...state.customRecipes]
+        .slice(-15)
+        .map((r) => r.name);
+
+      const newRecipe = await requestAiRecipe({
+        preferredTags,
+        ownedPantryNames,
+        excludeNames,
+      });
+
+      const customRecipes = [...state.customRecipes, newRecipe];
+      const nextState: AppState = {
+        ...state,
+        customRecipes,
+        seenIds: [...state.seenIds, newRecipe.id],
+      };
+      saveState(nextState);
+      window.localStorage.setItem(countKey, String(used + 1));
+      setState(nextState);
+      setCurrentRecipe(newRecipe);
+    } catch (err) {
+      setAiError(err instanceof Error ? err.message : "レシピ生成に失敗しました。");
+    } finally {
+      setAiLoading(false);
+    }
   }
 
   const preferredTags = state ? topTags(state.tagScores, 3) : [];
@@ -96,7 +153,7 @@ export default function HomePage() {
         </div>
       </main>
 
-      <div className="flex items-center justify-center gap-8 pb-4">
+      <div className="flex items-center justify-center gap-8 pb-3">
         <button
           aria-label="興味ない"
           onClick={() => handleSwipe(false)}
@@ -111,6 +168,17 @@ export default function HomePage() {
         >
           ♥
         </button>
+      </div>
+
+      <div className="flex flex-col items-center gap-1 pb-4">
+        <button
+          onClick={handleGenerateAi}
+          disabled={aiLoading}
+          className="rounded-full bg-orange-500 px-4 py-2 text-sm font-medium text-white shadow disabled:opacity-60"
+        >
+          {aiLoading ? "AIが考え中…" : "🤖 AIにレシピを考えてもらう"}
+        </button>
+        {aiError && <p className="max-w-xs text-center text-xs text-rose-500">{aiError}</p>}
       </div>
 
       {lastResult && (

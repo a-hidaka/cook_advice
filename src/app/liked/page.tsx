@@ -21,7 +21,7 @@ export default function LikedPage() {
   const likedRecipes = state
     ? Array.from(new Set(state.likedIds))
         .reverse()
-        .map((id) => recipes.find((r) => r.id === id))
+        .map((id) => [...recipes, ...state.customRecipes].find((r) => r.id === id))
         .filter((r): r is Recipe => Boolean(r))
     : [];
 
